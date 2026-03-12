@@ -1,0 +1,57 @@
+{
+  "conversation_id": "chatgpt-seeded-demo",
+  "source": "debug",
+  "analysis_mode": "deterministic",
+  "turns": [
+    {
+      "id": 1,
+      "role": "user",
+      "text": "I want to build a browser extension that visualizes topic drift in ChatGPT conversations."
+    },
+    {
+      "id": 2,
+      "role": "assistant",
+      "text": "Start with a Chrome extension, a content script to extract transcript turns, and a local FastAPI backend for semantic analysis."
+    },
+    {
+      "id": 3,
+      "role": "user",
+      "text": "How should the UI show the main path versus rabbit holes?"
+    },
+    {
+      "id": 4,
+      "role": "assistant",
+      "text": "Use a central rabbit trail for the dominant topic flow, lighter side branches for related detours, and broken hole nodes when the conversation sharply diverges."
+    },
+    {
+      "id": 5,
+      "role": "user",
+      "text": "We should also make the sidebar keyboard accessible and readable for demos."
+    },
+    {
+      "id": 6,
+      "role": "assistant",
+      "text": "Add focus states, keyboard navigation, and readable contrast, but keep the trail visualization as the hero surface."
+    },
+    {
+      "id": 7,
+      "role": "user",
+      "text": "Actually, how do regex capture groups work in JavaScript?"
+    },
+    {
+      "id": 8,
+      "role": "assistant",
+      "text": "Capture groups let you save parts of a regex match so they can be reused later."
+    },
+    {
+      "id": 9,
+      "role": "user",
+      "text": "Back to the extension: how should clicking a node jump to the correct ChatGPT message?"
+    },
+    {
+      "id": 10,
+      "role": "assistant",
+      "text": "Tag extracted transcript elements with stable turn ids, then scroll the matching DOM node into view when the sidebar node is selected."
+    }
+  ]
+}

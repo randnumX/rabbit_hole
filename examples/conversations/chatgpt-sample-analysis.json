@@ -1,0 +1,217 @@
+{
+  "conversation_id": "chatgpt-seeded-demo",
+  "analysis_mode": "deterministic",
+  "root_topic": {
+    "label": "browser extension / topic drift",
+    "centroid_turn_ids": [1, 2, 3]
+  },
+  "turns": [
+    {
+      "id": 1,
+      "role": "user",
+      "text": "I want to build a browser extension that visualizes topic drift in ChatGPT conversations.",
+      "topic_label": "browser extension / topic drift",
+      "cluster_id": 0,
+      "classification": "ON_PATH",
+      "drift_score": 0.08,
+      "root_relevance_score": 0.97,
+      "local_coherence_score": 0.98,
+      "prev_similarity": 1.0,
+      "local_similarity": 0.97,
+      "root_similarity": 0.97,
+      "explanation": "This turn stays on the main thread around browser extension / topic drift with strong local coherence (0.98) and root relevance (0.97).",
+      "ui": {
+        "path_type": "main",
+        "node_type": "start"
+      }
+    },
+    {
+      "id": 2,
+      "role": "assistant",
+      "text": "Start with a Chrome extension, a content script to extract transcript turns, and a local FastAPI backend for semantic analysis.",
+      "topic_label": "chrome extension / semantic analysis",
+      "cluster_id": 0,
+      "classification": "ON_PATH",
+      "drift_score": 0.14,
+      "root_relevance_score": 0.93,
+      "local_coherence_score": 0.92,
+      "prev_similarity": 0.89,
+      "local_similarity": 0.94,
+      "root_similarity": 0.93,
+      "explanation": "This turn stays on the main thread around chrome extension / semantic analysis with strong local coherence (0.92) and root relevance (0.93).",
+      "ui": {
+        "path_type": "main",
+        "node_type": "normal"
+      }
+    },
+    {
+      "id": 3,
+      "role": "user",
+      "text": "How should the UI show the main path versus rabbit holes?",
+      "topic_label": "ui path / rabbit holes",
+      "cluster_id": 0,
+      "classification": "DEEPENING",
+      "drift_score": 0.19,
+      "root_relevance_score": 0.88,
+      "local_coherence_score": 0.86,
+      "prev_similarity": 0.81,
+      "local_similarity": 0.9,
+      "root_similarity": 0.88,
+      "explanation": "This turn deepens the ongoing topic into ui path / rabbit holes while remaining connected to the root topic (0.88) and local cluster (0.86).",
+      "ui": {
+        "path_type": "main",
+        "node_type": "normal"
+      }
+    },
+    {
+      "id": 4,
+      "role": "assistant",
+      "text": "Use a central rabbit trail for the dominant topic flow, lighter side branches for related detours, and broken hole nodes when the conversation sharply diverges.",
+      "topic_label": "rabbit trail / broken nodes",
+      "cluster_id": 0,
+      "classification": "ON_PATH",
+      "drift_score": 0.16,
+      "root_relevance_score": 0.91,
+      "local_coherence_score": 0.89,
+      "prev_similarity": 0.84,
+      "local_similarity": 0.92,
+      "root_similarity": 0.91,
+      "explanation": "This turn stays on the main thread around rabbit trail / broken nodes with strong local coherence (0.89) and root relevance (0.91).",
+      "ui": {
+        "path_type": "main",
+        "node_type": "normal"
+      }
+    },
+    {
+      "id": 5,
+      "role": "user",
+      "text": "We should also make the sidebar keyboard accessible and readable for demos.",
+      "topic_label": "keyboard access / readable demos",
+      "cluster_id": 1,
+      "classification": "SIDE_QUEST",
+      "drift_score": 0.43,
+      "root_relevance_score": 0.49,
+      "local_coherence_score": 0.57,
+      "prev_similarity": 0.44,
+      "local_similarity": 0.65,
+      "root_similarity": 0.49,
+      "explanation": "This turn branches into keyboard access / readable demos. It drifts from the immediate trail but still keeps some connection to the root topic (0.49) or nearby cluster (0.57). A topic boundary was also detected.",
+      "ui": {
+        "path_type": "side",
+        "node_type": "normal"
+      }
+    },
+    {
+      "id": 6,
+      "role": "assistant",
+      "text": "Add focus states, keyboard navigation, and readable contrast, but keep the trail visualization as the hero surface.",
+      "topic_label": "focus states / keyboard navigation",
+      "cluster_id": 1,
+      "classification": "SIDE_QUEST",
+      "drift_score": 0.39,
+      "root_relevance_score": 0.46,
+      "local_coherence_score": 0.62,
+      "prev_similarity": 0.71,
+      "local_similarity": 0.56,
+      "root_similarity": 0.46,
+      "explanation": "This turn branches into focus states / keyboard navigation. It drifts from the immediate trail but still keeps some connection to the root topic (0.46) or nearby cluster (0.62).",
+      "ui": {
+        "path_type": "side",
+        "node_type": "normal"
+      }
+    },
+    {
+      "id": 7,
+      "role": "user",
+      "text": "Actually, how do regex capture groups work in JavaScript?",
+      "topic_label": "regex capture groups",
+      "cluster_id": 4,
+      "classification": "RABBIT_HOLE",
+      "drift_score": 0.84,
+      "root_relevance_score": 0.18,
+      "local_coherence_score": 0.22,
+      "prev_similarity": 0.19,
+      "local_similarity": 0.24,
+      "root_similarity": 0.18,
+      "explanation": "This turn likely diverged from the main thread because it introduced regex capture groups with low root relevance (0.18) and low local coherence (0.22). A topic boundary was also detected.",
+      "ui": {
+        "path_type": "rabbit_hole",
+        "node_type": "broken"
+      }
+    },
+    {
+      "id": 8,
+      "role": "assistant",
+      "text": "Capture groups let you save parts of a regex match so they can be reused later.",
+      "topic_label": "regex capture groups",
+      "cluster_id": 4,
+      "classification": "RABBIT_HOLE",
+      "drift_score": 0.76,
+      "root_relevance_score": 0.21,
+      "local_coherence_score": 0.34,
+      "prev_similarity": 0.68,
+      "local_similarity": 0.27,
+      "root_similarity": 0.21,
+      "explanation": "This turn likely diverged from the main thread because it introduced regex capture groups with low root relevance (0.21) and low local coherence (0.34).",
+      "ui": {
+        "path_type": "rabbit_hole",
+        "node_type": "broken"
+      }
+    },
+    {
+      "id": 9,
+      "role": "user",
+      "text": "Back to the extension: how should clicking a node jump to the correct ChatGPT message?",
+      "topic_label": "node click / transcript scroll",
+      "cluster_id": 0,
+      "classification": "RETURN_TO_PATH",
+      "drift_score": 0.21,
+      "root_relevance_score": 0.82,
+      "local_coherence_score": 0.73,
+      "prev_similarity": 0.41,
+      "local_similarity": 0.94,
+      "root_similarity": 0.82,
+      "explanation": "This turn reconnects to the main thread through node click / transcript scroll. Root relevance recovered to 0.82, indicating a return from the earlier drift.",
+      "ui": {
+        "path_type": "return",
+        "node_type": "return"
+      }
+    },
+    {
+      "id": 10,
+      "role": "assistant",
+      "text": "Tag extracted transcript elements with stable turn ids, then scroll the matching DOM node into view when the sidebar node is selected.",
+      "topic_label": "stable turn ids / scroll into view",
+      "cluster_id": 0,
+      "classification": "ON_PATH",
+      "drift_score": 0.12,
+      "root_relevance_score": 0.9,
+      "local_coherence_score": 0.88,
+      "prev_similarity": 0.83,
+      "local_similarity": 0.91,
+      "root_similarity": 0.9,
+      "explanation": "This turn stays on the main thread around stable turn ids / scroll into view with strong local coherence (0.88) and root relevance (0.90).",
+      "ui": {
+        "path_type": "main",
+        "node_type": "normal"
+      }
+    }
+  ],
+  "edges": [
+    { "source": 1, "target": 2, "relationship": "main_path", "strength": 0.89 },
+    { "source": 2, "target": 3, "relationship": "deepening", "strength": 0.81 },
+    { "source": 3, "target": 4, "relationship": "main_path", "strength": 0.84 },
+    { "source": 4, "target": 5, "relationship": "side_quest", "strength": 0.44 },
+    { "source": 5, "target": 6, "relationship": "side_quest", "strength": 0.71 },
+    { "source": 6, "target": 7, "relationship": "rabbit_hole_jump", "strength": 0.19 },
+    { "source": 7, "target": 8, "relationship": "rabbit_hole_jump", "strength": 0.68 },
+    { "source": 8, "target": 9, "relationship": "return_to_path", "strength": 0.41 },
+    { "source": 9, "target": 10, "relationship": "main_path", "strength": 0.83 }
+  ],
+  "summary": {
+    "total_turns": 10,
+    "rabbit_holes": 2,
+    "side_quests": 2,
+    "returns_to_path": 1
+  }
+}

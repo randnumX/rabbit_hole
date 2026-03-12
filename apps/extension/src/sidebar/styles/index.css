@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:host,
+.rabbithole-shell {
+  color-scheme: dark;
+  font-family: "SF Pro Display", "Avenir Next", "Segoe UI", sans-serif;
+  pointer-events: none;
+}
+
+.rabbithole-shell * {
+  box-sizing: border-box;
+}
+
+.rabbithole-shell button,
+.rabbithole-shell aside,
+.rabbithole-shell textarea,
+.rabbithole-shell svg g[role="button"] {
+  pointer-events: auto;
+}
+
+.rabbithole-shell button,
+.rabbithole-shell textarea {
+  font: inherit;
+}
+
+.rabbithole-shell ::-webkit-scrollbar {
+  width: 10px;
+}
+
+.rabbithole-shell ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rabbithole-shell ::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  background-clip: padding-box;
+}
+
+.rabbithole-scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.rabbithole-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
