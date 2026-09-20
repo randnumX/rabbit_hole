@@ -9,6 +9,7 @@ import type {
 import { buildAnalysisRequestFingerprint } from '@/shared/requestFingerprint';
 import { buildDebugAnalysisRequest, parseDebugTranscript } from '@/shared/transcript';
 import type { TranscriptTargetContext } from '@/shared/transcriptTarget';
+import { getStoredLlmSettings, requestLlmEndpointPermission, setStoredLlmSettings } from '@/shared/llmSettings';
 import { useSidebarStore } from '@/sidebar/store';
 
 export interface SidebarBindings {
@@ -44,6 +45,7 @@ export function useSidebarController(bindings: SidebarBindings) {
 
   useEffect(() => {
     void refreshBackendStatus();
+    void getStoredLlmSettings().then((settings) => useSidebarStore.getState().hydrateLlmSettings(settings));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -232,6 +234,27 @@ export function useSidebarController(bindings: SidebarBindings) {
     store.setOpen(true);
   }
 
+  async function saveLlmSettings(settings: { endpointUrl: string; apiKey: string; model: string }) {
+    const granted = await requestLlmEndpointPermission(settings.endpointUrl);
+    if (!granted) {
+      throw new Error('Permission to reach that endpoint was not granted.');
+    }
+    await setStoredLlmSettings({
+      endpointUrl: settings.endpointUrl,
+      apiKey: settings.apiKey || undefined,
+      model: settings.model,
+    });
+    const currentStore = useSidebarStore.getState();
+    currentStore.hydrateLlmSettings(settings);
+    await refreshBackendStatus();
+  }
+
+  async function clearLlmSettings() {
+    await setStoredLlmSettings(null);
+    useSidebarStore.getState().hydrateLlmSettings(null);
+    await refreshBackendStatus();
+  }
+
   const selectedTurn = useMemo(
     () => store.analysis?.turns.find((turn) => turn.id === store.selectedTurnId) ?? store.analysis?.turns.at(-1) ?? null,
     [store.analysis, store.selectedTurnId],
@@ -245,6 +268,8 @@ export function useSidebarController(bindings: SidebarBindings) {
     refreshAnalysis,
     analyzeDebugTranscript,
     loadSample,
+    saveLlmSettings,
+    clearLlmSettings,
     selectTurn: store.setSelectedTurnId,
     setAnalysisMode: (analysisMode: AnalysisMode) => store.setAnalysisMode(analysisMode),
     setPanelWidth: store.setPanelWidth,

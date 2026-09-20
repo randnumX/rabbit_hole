@@ -1,0 +1,147 @@
+/**
+ * Mirrors apps/backend/app/config.py's AnalysisConfig dataclass.
+ *
+ * Every numeric threshold/weight field and its default value is preserved exactly
+ * (field names translated to camelCase). The Python-only env-var plumbing for
+ * local_llm_*, openai_api_key, and llm_provider/llm_model is dropped -- LLM
+ * connectivity is now user-configured via chrome.storage (see llmClient.ts).
+ */
+export interface AnalysisConfig {
+  modelName: string;
+  rootTurnWindow: number;
+  localWindow: number;
+  clusterDistanceThreshold: number;
+  changePointBonus: number;
+  onPathPrevSimilarity: number;
+  onPathLocalSimilarity: number;
+  onPathRootSimilarity: number;
+  onPathMainPathSimilarity: number;
+  onPathContinuityPrevSimilarity: number;
+  onPathContinuityLocalSimilarity: number;
+  onPathContinuityRootSimilarity: number;
+  onPathContinuityMainPathSimilarity: number;
+  onPathLexicalOverlap: number;
+  deepeningLocalSimilarity: number;
+  deepeningRootSimilarity: number;
+  deepeningMainPathSimilarity: number;
+  deepeningContinuityLocalSimilarity: number;
+  deepeningContinuityRootSimilarity: number;
+  deepeningContinuityMainPathSimilarity: number;
+  deepeningLexicalOverlap: number;
+  deepeningNoveltyMin: number;
+  deepeningNoveltyMax: number;
+  sideQuestRootSimilarity: number;
+  sideQuestLocalSimilarity: number;
+  rabbitPrevSimilarity: number;
+  rabbitLocalSimilarity: number;
+  rabbitRootSimilarity: number;
+  rabbitMainPathSimilarity: number;
+  rabbitLexicalOverlapMax: number;
+  rabbitDriftScore: number;
+  returnRootSimilarity: number;
+  returnMainPathSimilarity: number;
+  returnSimilarityRebound: number;
+  weightPrevSimilarity: number;
+  weightLocalSimilarity: number;
+  weightRootSimilarity: number;
+  weightMainPathSimilarity: number;
+  lexicalPrevBoost: number;
+  lexicalLocalBoost: number;
+  lexicalRootBoost: number;
+  lexicalMainPathBoost: number;
+  lineageSimilarityWeight: number;
+  lineageKeywordWeight: number;
+  lineageRecencyBonus: number;
+  lineageStalePenalty: number;
+  lineageMaxAgeTurns: number;
+  lineageMatchThreshold: number;
+  lineageCreateThreshold: number;
+  branchDeepeningSimilarity: number;
+  branchDeepeningAnchor: number;
+  branchSideSimilarity: number;
+  branchSideAnchor: number;
+  branchRabbitGuard: number;
+  focusSummaryCharBudget: number;
+  focusSummarySentenceLimit: number;
+  focusSummaryMinResponseChars: number;
+  contextualPromptCharThreshold: number;
+  contextualPromptKeywordThreshold: number;
+  contextualPromptOverlapThreshold: number;
+  contextualPromptImplicitOverlapThreshold: number;
+  contextualPromptContextCharBudget: number;
+  llmTimeoutSeconds: number;
+  llmSummaryTemperature: number;
+  llmClassificationTemperature: number;
+  summaryMaxTokens: number;
+  classificationMaxTokens: number;
+}
+
+export const DEFAULT_CONFIG: AnalysisConfig = {
+  modelName: 'Xenova/all-MiniLM-L6-v2',
+  rootTurnWindow: 3,
+  localWindow: 3,
+  clusterDistanceThreshold: 0.35,
+  changePointBonus: 0.08,
+  onPathPrevSimilarity: 0.55,
+  onPathLocalSimilarity: 0.72,
+  onPathRootSimilarity: 0.52,
+  onPathMainPathSimilarity: 0.58,
+  onPathContinuityPrevSimilarity: 0.42,
+  onPathContinuityLocalSimilarity: 0.5,
+  onPathContinuityRootSimilarity: 0.46,
+  onPathContinuityMainPathSimilarity: 0.48,
+  onPathLexicalOverlap: 0.34,
+  deepeningLocalSimilarity: 0.7,
+  deepeningRootSimilarity: 0.38,
+  deepeningMainPathSimilarity: 0.46,
+  deepeningContinuityLocalSimilarity: 0.46,
+  deepeningContinuityRootSimilarity: 0.34,
+  deepeningContinuityMainPathSimilarity: 0.4,
+  deepeningLexicalOverlap: 0.24,
+  deepeningNoveltyMin: 0.2,
+  deepeningNoveltyMax: 0.45,
+  sideQuestRootSimilarity: 0.38,
+  sideQuestLocalSimilarity: 0.45,
+  rabbitPrevSimilarity: 0.35,
+  rabbitLocalSimilarity: 0.35,
+  rabbitRootSimilarity: 0.32,
+  rabbitMainPathSimilarity: 0.34,
+  rabbitLexicalOverlapMax: 0.16,
+  rabbitDriftScore: 0.68,
+  returnRootSimilarity: 0.62,
+  returnMainPathSimilarity: 0.6,
+  returnSimilarityRebound: 0.18,
+  weightPrevSimilarity: 0.18,
+  weightLocalSimilarity: 0.28,
+  weightRootSimilarity: 0.32,
+  weightMainPathSimilarity: 0.22,
+  lexicalPrevBoost: 0.08,
+  lexicalLocalBoost: 0.22,
+  lexicalRootBoost: 0.14,
+  lexicalMainPathBoost: 0.18,
+  lineageSimilarityWeight: 0.76,
+  lineageKeywordWeight: 0.24,
+  lineageRecencyBonus: 0.08,
+  lineageStalePenalty: 0.035,
+  lineageMaxAgeTurns: 6,
+  lineageMatchThreshold: 0.42,
+  lineageCreateThreshold: 0.38,
+  branchDeepeningSimilarity: 0.5,
+  branchDeepeningAnchor: 0.48,
+  branchSideSimilarity: 0.36,
+  branchSideAnchor: 0.3,
+  branchRabbitGuard: 0.28,
+  focusSummaryCharBudget: 280,
+  focusSummarySentenceLimit: 2,
+  focusSummaryMinResponseChars: 180,
+  contextualPromptCharThreshold: 116,
+  contextualPromptKeywordThreshold: 9,
+  contextualPromptOverlapThreshold: 0.22,
+  contextualPromptImplicitOverlapThreshold: 0.08,
+  contextualPromptContextCharBudget: 180,
+  llmTimeoutSeconds: 20.0,
+  llmSummaryTemperature: 0.1,
+  llmClassificationTemperature: 0.15,
+  summaryMaxTokens: 96,
+  classificationMaxTokens: 420,
+};

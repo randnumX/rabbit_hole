@@ -2,91 +2,25 @@
 
 RabbitHole is a local demo project that injects a storytelling sidebar into ChatGPT and visualizes topic drift as a rabbit moving along a conversation trail. Healthy progression stays on the main trail. Side explorations branch off. Major semantic drift becomes a rabbit hole with broken connectors and explicit explanation.
 
-The backend now uses a multi-lineage scorer instead of a single rolling trajectory:
+RabbitHole is a pure Chrome extension — there is no backend process. All analysis (embeddings, clustering, and the multi-lineage drift scorer) runs in-browser inside the extension's background service worker:
 - one root intent
 - one evolving mainline
 - several temporary sub-lineages scored in parallel
 
 ## Stack
 - Chrome extension: Manifest V3, React, TypeScript, Vite, Tailwind CSS, Framer Motion, Zustand
-- Backend: FastAPI, sentence-transformers, scikit-learn, numpy, ruptures, local Hugging Face SLM runtime, optional OpenAI fallback
+- In-extension analysis engine: transformers.js (in-browser embeddings, WASM), a hand-rolled multi-lineage drift scorer, and an OpenAI-chat-completions-compatible client for optional LLM assist
 - Shared contracts: TypeScript workspace package
 
 ## Prerequisites
 - Node `20+`
 - `pnpm`
-- Python `3.11+`
 - Google Chrome
-
-The current machine this repo was planned on only exposed Python `3.9.6` and did not have `node` or `pnpm` installed. Install the required runtimes first before running the demo.
 
 ## Install Dependencies
 
 ```bash
 pnpm install
-```
-
-## Run The Backend
-
-```bash
-cd apps/backend
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-The API will start at `http://127.0.0.1:8000`.
-
-Optional logging override:
-
-```bash
-export RABBITHOLE_LOG_LEVEL=DEBUG
-```
-
-### Local SLM Mode
-
-RabbitHole now supports three analysis modes in the sidebar:
-- `Deterministic`: multi-lineage scorer only
-- `Hybrid`: local SLM summarizes long assistant replies, then the multi-lineage scorer classifies
-- `Probabilistic`: local SLM summarizes and classifies each exchange, while the backend still keeps the deterministic metrics for inspection
-
-By default the backend is configured to use a local Hugging Face instruct model:
-
-```bash
-export RABBITHOLE_LOCAL_LLM_MODEL=HuggingFaceTB/SmolLM2-1.7B-Instruct
-```
-
-On the first backend start, the model will be downloaded into the Hugging Face cache and then loaded by FastAPI. This can take time.
-
-If you want a lighter first-run model that starts faster on CPU, use:
-
-```bash
-export RABBITHOLE_LOCAL_LLM_MODEL=HuggingFaceTB/SmolLM2-360M-Instruct
-```
-
-Optional local overrides:
-
-```bash
-export RABBITHOLE_LOCAL_LLM_CACHE_DIR=/absolute/path/to/model-cache
-export RABBITHOLE_LOCAL_LLM_DEVICE=cpu
-export RABBITHOLE_LOCAL_LLM_PRELOAD_ON_START=true
-```
-
-If you want a stronger but heavier local model, override the model name before starting FastAPI:
-
-```bash
-export RABBITHOLE_LOCAL_LLM_MODEL=Qwen/Qwen2.5-3B-Instruct
-```
-
-### Optional OpenAI fallback
-
-If you want to fall back to OpenAI instead of the local model:
-
-```bash
-export RABBITHOLE_LLM_PROVIDER=openai
-export OPENAI_API_KEY=your_key_here
-export RABBITHOLE_LLM_MODEL=gpt-4o-mini
 ```
 
 ## Build Or Watch The Extension
@@ -111,15 +45,31 @@ pnpm build
 3. Click `Load unpacked`.
 4. Select `apps/extension/dist`.
 
+## Analysis Modes
+
+RabbitHole supports three analysis modes in the sidebar:
+- `Deterministic`: multi-lineage scorer only. Works immediately, no configuration needed. Embeddings run in-browser via transformers.js (`Xenova/all-MiniLM-L6-v2`), falling back to a deterministic hashing embedding if the model fails to load.
+- `Hybrid`: an LLM summarizes long assistant replies, then the multi-lineage scorer classifies.
+- `Probabilistic`: an LLM summarizes and classifies each exchange, while the deterministic metrics are still kept for inspection.
+
+Hybrid and Probabilistic modes require an LLM endpoint. Open the sidebar's Settings panel (gear icon) and configure:
+- **Endpoint URL** — a full URL speaking the OpenAI chat-completions wire format, e.g.:
+  - Remote: `https://api.openai.com/v1/chat/completions`
+  - Local (Ollama): `http://localhost:11434/v1/chat/completions`
+  - Local (LM Studio): `http://localhost:1234/v1/chat/completions`
+- **Model** — the model name to send in each request.
+- **API key** — optional, needed for most remote providers, usually left blank for local servers.
+
+The first time you save a new endpoint, Chrome will prompt you to grant that origin permission (RabbitHole requests it at runtime via `optional_host_permissions`, rather than declaring a broad static permission upfront).
+
 ## Test On ChatGPT
-1. Start the backend locally.
-2. Load the unpacked extension in Chrome.
-3. Open a ChatGPT conversation at `https://chatgpt.com/`.
-4. Open the RabbitHole launcher.
-5. Pick `Deterministic`, `Hybrid`, or `Probabilistic` in the header.
-6. Click `Analyze`.
-7. Inspect the root topic, rabbit path, side quests, rabbit-hole events, and return-to-path nodes.
-8. Click any node to scroll to the matching transcript turn in ChatGPT.
+1. Load the unpacked extension in Chrome (no backend to start).
+2. Open a ChatGPT conversation at `https://chatgpt.com/`.
+3. Open the RabbitHole launcher.
+4. Pick `Deterministic`, `Hybrid`, or `Probabilistic` in the header (Hybrid/Probabilistic require an LLM endpoint configured in Settings).
+5. Click `Analyze`.
+6. Inspect the root topic, rabbit path, side quests, rabbit-hole events, and return-to-path nodes.
+7. Click any node to scroll to the matching transcript turn in ChatGPT.
 
 ## Debug And Demo Mode
 - If live ChatGPT extraction fails, open the debug panel in the extension sidebar.
@@ -127,13 +77,14 @@ pnpm build
 - The sample raw and analyzed fixtures live in `examples/conversations/`.
 
 ## Test Commands
-- Backend: `cd apps/backend && pytest`
 - Extension: `pnpm test:extension`
+- Typecheck: `pnpm typecheck:extension`
 
 ## Project Highlights
-- Centralized drift thresholds in `apps/backend/app/config.py`
+- Centralized drift thresholds in `apps/extension/src/analysis/config.ts`
 - Multi-lineage scorer combines previous-turn similarity, root-topic relevance, evolving mainline affinity, and temporary branch lineage matches
-- Local SLM assist for long-response semantic focus summaries and probabilistic turn classification
+- In-browser embeddings (transformers.js) with a deterministic hashing fallback — no network dependency for Deterministic mode
+- Configurable LLM endpoint (remote or `localhost`) for Hybrid/Probabilistic-mode summarization and classification
 - ChatGPT-first site adapter pattern for future Claude and Gemini support
 - SVG trail renderer with rabbit motion states for on-path, side quest, rabbit hole, and return
 - Click-through transcript navigation from visualization nodes

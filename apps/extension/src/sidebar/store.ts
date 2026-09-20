@@ -20,6 +20,10 @@ interface SidebarState {
   selectedTurnId: number | null;
   debugTranscript: string;
   panelWidth: number;
+  settingsOpen: boolean;
+  llmEndpointUrl: string;
+  llmApiKey: string;
+  llmModel: string;
   setOpen: (open: boolean) => void;
   setDebugMode: (debugMode: boolean) => void;
   setBusyState: (busyState: BusyState) => void;
@@ -33,6 +37,11 @@ interface SidebarState {
   setSelectedTurnId: (selectedTurnId: number | null) => void;
   setDebugTranscript: (debugTranscript: string) => void;
   setPanelWidth: (panelWidth: number) => void;
+  setSettingsOpen: (settingsOpen: boolean) => void;
+  setLlmEndpointUrl: (llmEndpointUrl: string) => void;
+  setLlmApiKey: (llmApiKey: string) => void;
+  setLlmModel: (llmModel: string) => void;
+  hydrateLlmSettings: (settings: { endpointUrl: string; apiKey?: string; model: string } | null) => void;
   resetForConversation: () => void;
 }
 
@@ -50,6 +59,10 @@ export const useSidebarStore = create<SidebarState>((set) => ({
   selectedTurnId: null,
   debugTranscript: '',
   panelWidth: SIDEBAR_WIDTH_PX,
+  settingsOpen: false,
+  llmEndpointUrl: '',
+  llmApiKey: '',
+  llmModel: '',
   setOpen: (open) => set({ open }),
   setDebugMode: (debugMode) => set({ debugMode }),
   setBusyState: (busyState) => set({ busyState }),
@@ -67,6 +80,16 @@ export const useSidebarStore = create<SidebarState>((set) => ({
   setSelectedTurnId: (selectedTurnId) => set({ selectedTurnId }),
   setDebugTranscript: (debugTranscript) => set({ debugTranscript }),
   setPanelWidth: (panelWidth) => set({ panelWidth }),
+  setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
+  setLlmEndpointUrl: (llmEndpointUrl) => set({ llmEndpointUrl }),
+  setLlmApiKey: (llmApiKey) => set({ llmApiKey }),
+  setLlmModel: (llmModel) => set({ llmModel }),
+  hydrateLlmSettings: (settings) =>
+    set({
+      llmEndpointUrl: settings?.endpointUrl ?? '',
+      llmApiKey: settings?.apiKey ?? '',
+      llmModel: settings?.model ?? '',
+    }),
   resetForConversation: () =>
     set({
       analysis: null,

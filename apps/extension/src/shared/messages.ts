@@ -7,6 +7,13 @@ export type ExtensionMessageType =
   | 'LOAD_SAMPLE_CONVERSATION'
   | 'BACKEND_STATUS';
 
+/**
+ * Reports the in-extension analysis engine's status (no backend process exists
+ * anymore). `status` stays 'online' since the local engine is always usable
+ * (worst case it falls back to hashing embeddings); `fallbackActive` reflects
+ * that fallback, and `llmAvailable`/`availableModes` reflect whether a
+ * user-configured LLM endpoint (see shared/llmSettings.ts) is currently reachable.
+ */
 export interface BackendStatusPayload {
   status: 'online' | 'offline';
   modelName?: string;

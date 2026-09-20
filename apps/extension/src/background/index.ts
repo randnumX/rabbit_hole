@@ -1,6 +1,10 @@
 import type { AnalysisMode, AnalysisRequest, AnalysisResponse } from '@rabbithole/shared-types';
 import { sampleAnalysis, sampleConversationRequest } from '@/fixtures';
-import { DEFAULT_BACKEND_URL } from '@/shared/config';
+import { DriftAnalyzer, NoopModelAssistService } from '@/analysis/analyzer';
+import { DEFAULT_CONFIG } from '@/analysis/config';
+import { TransformersEmbeddingProvider } from '@/analysis/embeddings';
+import { HttpModelAssistService, pingLlmEndpoint } from '@/analysis/llmClient';
+import { getStoredLlmSettings } from '@/shared/llmSettings';
 import { buildAnalysisRequestFingerprint } from '@/shared/requestFingerprint';
 import type {
   AnalyzeResponsePayload,
@@ -12,42 +16,38 @@ import type {
 
 const analysisCache = new Map<string, AnalysisResponse>();
 
+// Reused across requests so the embedding model (and its WASM/IndexedDB-cached
+// weights) is only loaded once per service-worker lifetime, not per analysis call.
+const embeddingProvider = new TransformersEmbeddingProvider();
+
 function buildCacheKey(pageUrl: string, request: AnalysisRequest): string {
   return `${pageUrl}::${buildAnalysisRequestFingerprint(request)}`;
 }
 
-async function fetchBackendStatus(): Promise<BackendStatusPayload> {
-  try {
-    const response = await fetch(`${DEFAULT_BACKEND_URL}/api/health`);
-    if (!response.ok) {
-      throw new Error(`Health check failed with ${response.status}`);
-    }
+function availableModesFor(llmReachable: boolean): AnalysisMode[] {
+  const modes: AnalysisMode[] = ['deterministic'];
+  if (llmReachable) modes.push('hybrid', 'probabilistic');
+  return modes;
+}
 
-    const payload = (await response.json()) as {
-      model_name: string;
-      fallback_active?: boolean;
-      llm_available?: boolean;
-      llm_model?: string;
-      available_modes?: AnalysisMode[];
-    };
-    const status: BackendStatusPayload = {
-      status: 'online',
-      modelName: payload.model_name,
-      fallbackActive: Boolean(payload.fallback_active),
-      llmAvailable: Boolean(payload.llm_available),
-      llmModel: payload.llm_model,
-      availableModes: payload.available_modes,
-      checkedAt: Date.now(),
-    };
-    return status;
-  } catch (error) {
-    const status: BackendStatusPayload = {
-      status: 'offline',
-      checkedAt: Date.now(),
-      error: error instanceof Error ? error.message : 'Unknown backend error',
-    };
-    return status;
-  }
+/**
+ * Replaces the old FastAPI /api/health check: reports whether the embedding
+ * engine fell back to hashing embeddings, and whether a configured LLM endpoint
+ * is currently reachable (gates Hybrid/Probabilistic mode availability).
+ */
+async function checkStatus(): Promise<BackendStatusPayload> {
+  const llmSettings = await getStoredLlmSettings();
+  const llmReachable = llmSettings ? await pingLlmEndpoint(llmSettings) : false;
+
+  return {
+    status: 'online',
+    modelName: embeddingProvider.modelName,
+    fallbackActive: embeddingProvider.fallbackActive,
+    llmAvailable: llmReachable,
+    llmModel: llmSettings?.model,
+    availableModes: availableModesFor(llmReachable),
+    checkedAt: Date.now(),
+  };
 }
 
 async function analyzeConversation(message: BackgroundRequestMessage): Promise<BackgroundResponse<AnalyzeResponsePayload>> {
@@ -69,32 +69,29 @@ async function analyzeConversation(message: BackgroundRequestMessage): Promise<B
     };
   }
 
-  const response = await fetch(`${DEFAULT_BACKEND_URL}/api/analyze`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message.payload.request),
-  });
+  try {
+    const llmSettings = await getStoredLlmSettings();
+    const modelAssist = llmSettings
+      ? new HttpModelAssistService(DEFAULT_CONFIG, llmSettings)
+      : new NoopModelAssistService(DEFAULT_CONFIG);
+    const analyzer = new DriftAnalyzer({ embeddingProvider, modelAssist });
 
-  if (!response.ok) {
-    const detail = await response.text();
+    const analysis = await analyzer.analyze(message.payload.request);
+    analysisCache.set(cacheKey, analysis);
+
+    return {
+      ok: true,
+      data: {
+        analysis,
+        cacheHit: false,
+      },
+    };
+  } catch (error) {
     return {
       ok: false,
-      error: detail || `Analysis failed with ${response.status}`,
+      error: error instanceof Error ? error.message : 'Analysis failed.',
     };
   }
-
-  const analysis = (await response.json()) as AnalysisResponse;
-  analysisCache.set(cacheKey, analysis);
-
-  return {
-    ok: true,
-    data: {
-      analysis,
-      cacheHit: false,
-    },
-  };
 }
 
 function loadSampleConversation(): BackgroundResponse<SampleConversationPayload> {
@@ -109,7 +106,7 @@ function loadSampleConversation(): BackgroundResponse<SampleConversationPayload>
 
 chrome.runtime.onMessage.addListener((message: BackgroundRequestMessage, _sender, sendResponse) => {
   if (message.type === 'BACKEND_STATUS') {
-    void fetchBackendStatus().then((status) => sendResponse({ ok: true, data: status }));
+    void checkStatus().then((status) => sendResponse({ ok: true, data: status }));
     return true;
   }
 

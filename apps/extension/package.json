@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.4.2",
     "@rabbithole/shared-types": "workspace:*",
     "framer-motion": "^11.18.2",
     "react": "^18.3.1",

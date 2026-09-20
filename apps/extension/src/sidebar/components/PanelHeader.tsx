@@ -11,6 +11,7 @@ interface PanelHeaderProps {
   onAnalyze: () => void;
   onRefresh: () => void;
   onToggleDebug: () => void;
+  onToggleSettings: () => void;
   onChangeAnalysisMode: (mode: AnalysisMode) => void;
   onClose: () => void;
 }
@@ -64,6 +65,19 @@ function DebugIcon() {
   );
 }
 
+function SettingsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="3" />
+      <path
+        d="M19.4 13a7.97 7.97 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a8.07 8.07 0 0 0-1.7-1L14.9 3h-4l-.4 2.6a8.07 8.07 0 0 0-1.7 1l-2.5-1-2 3.4L6.4 11a7.97 7.97 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1c.5.4 1.1.75 1.7 1l.4 2.6h4l.4-2.6c.6-.25 1.2-.6 1.7-1l2.5 1 2-3.4z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function CloseIcon() {
   return (
     <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -105,6 +119,7 @@ export function PanelHeader({
   onAnalyze,
   onRefresh,
   onToggleDebug,
+  onToggleSettings,
   onChangeAnalysisMode,
   onClose,
 }: PanelHeaderProps) {
@@ -156,6 +171,9 @@ export function PanelHeader({
         </IconButton>
         <IconButton title="Toggle debug panel" onClick={onToggleDebug}>
           <DebugIcon />
+        </IconButton>
+        <IconButton title="LLM endpoint settings" onClick={onToggleSettings}>
+          <SettingsIcon />
         </IconButton>
       </div>
     </div>

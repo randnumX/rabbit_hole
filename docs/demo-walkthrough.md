@@ -1,9 +1,8 @@
 # RabbitHole Demo Walkthrough
 
 ## Setup
-1. Start the backend with `uvicorn app.main:app --reload` from `apps/backend`.
-2. Run `pnpm dev:extension` from the repo root.
-3. Load `apps/extension/dist` as an unpacked extension in Chrome.
+1. Run `pnpm dev:extension` from the repo root.
+2. Load `apps/extension/dist` as an unpacked extension in Chrome. No backend process is needed — Deterministic mode works immediately.
 
 ## Live Demo Script
 1. Open a ChatGPT conversation about building an LLM browser extension.

@@ -6,6 +6,7 @@ import { TrailMap } from '@/sidebar/components/TrailMap';
 import { InspectorPanel } from '@/sidebar/components/InspectorPanel';
 import { TimelineStrip } from '@/sidebar/components/TimelineStrip';
 import { DebugPanel } from '@/sidebar/components/DebugPanel';
+import { SettingsPanel } from '@/sidebar/components/SettingsPanel';
 import { useSidebarController, type SidebarBindings } from '@/sidebar/hooks/useSidebarController';
 import {
   SIDEBAR_MAX_WIDTH_PX,
@@ -183,11 +184,22 @@ export function SidebarApp({ bindings }: SidebarAppProps) {
             onAnalyze={() => void controller.analyzeLiveConversation(true)}
             onRefresh={() => void controller.refreshAnalysis()}
             onToggleDebug={() => controller.setDebugMode(!controller.debugMode)}
+            onToggleSettings={() => controller.setSettingsOpen(!controller.settingsOpen)}
             onChangeAnalysisMode={controller.setAnalysisMode}
             onClose={() => controller.setOpen(false)}
           />
 
           <div className="mt-3 flex-1 space-y-3 overflow-y-auto pr-1">
+            {controller.settingsOpen ? (
+              <SettingsPanel
+                llmEndpointUrl={controller.llmEndpointUrl}
+                llmApiKey={controller.llmApiKey}
+                llmModel={controller.llmModel}
+                onSave={controller.saveLlmSettings}
+                onClear={controller.clearLlmSettings}
+              />
+            ) : null}
+
             {controller.analysis ? (
               <>
                 <TrailMap

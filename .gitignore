@@ -1,12 +1,6 @@
 node_modules/
 dist/
 .DS_Store
-__pycache__/
-*.pyc
-.pytest_cache/
-.mypy_cache/
-.venv/
-apps/backend/.venv/
 coverage/
 *.log
 .tooling/
